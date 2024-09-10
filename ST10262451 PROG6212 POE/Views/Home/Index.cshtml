@@ -6,3 +6,33 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+@model List<CMCSProject.Models.Claim>
+
+<h2>Lecturer Dashboard</h2>
+
+<a href="/Claims/Submit" class="btn btn-primary">Submit New Claim</a>
+
+<h3>Your Claims</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Claim ID</th>
+            <th>Hours Worked</th>
+            <th>Hourly Rate</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.ClaimID</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.HourlyRate</td>
+                <td>@claim.TotalAmount</td>
+                <td>@claim.Status</td>
+            </tr>
+        }
+    </tbody>
+</table>
