@@ -46,7 +46,4 @@
 
 public interface IClaimService
 {
-    Task ApproveClaimAsync(int id);
-    Task<string?> GetPendingClaimsAsync();
-    Task RejectClaimAsync(int id);
 }
