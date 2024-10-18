@@ -1,31 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using System.Threading.Tasks;
+using YourProject.Models;
+using YourProject.Services;
 
-namespace CMCSProject.Controllers
+namespace YourProject.Controllers
 {
     public class ClaimsController : Controller
     {
-        // Simulated database for claims
-        private static List<Claim> claims = new List<Claim>();
+        private readonly IClaimService _claimService;
 
-        public IActionResult Index()
+        public ClaimsController(IClaimService claimService)
         {
-            return View(claims); // Display the list of claims
+            _claimService = claimService;
         }
 
-        // GET: Submit New Claim
-        public IActionResult Submit()
+        // GET: Claims/Create
+        [HttpGet]
+        public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Submit Claim
+        // POST: Claims/Create
         [HttpPost]
-        public IActionResult Submit(Claim claim)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Claim claim)
         {
-            claim.ClaimID = claims.Count + 1; // Auto-generate ClaimID
-            claims.Add(claim); // Add claim to list
-            return RedirectToAction("Index");
+            if (ModelState.IsValid)
+            {
+                await _claimService.SubmitClaimAsync(claim);
+                return RedirectToAction("Index", "Claims");
+            }
+            return View(claim);
+        }
+
+        // GET: Claims/Index (View all submitted claims)
+        public async Task<IActionResult> Index()
+        {
+            var claims = await _claimService.GetAllClaimsAsync();
+            return View(claims);
         }
     }
 }
