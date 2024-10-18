@@ -36,3 +36,34 @@
         }
     </tbody>
 </table>
+
+@model List<CMCSProject.Models.Claim>
+
+<h2>Pending Claims</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Claim ID</th>
+            <th>Lecturer Name</th>
+            <th>Hours Worked</th>
+            <th>Total Amount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.ClaimID</td>
+                <td>@claim.LecturerID</td> <!-- Link to lecturer -->
+                <td>@claim.HoursWorked</td>
+                <td>@claim.TotalAmount</td>
+                <td>
+                    <a href="/Approvals/Approve/@claim.ClaimID" class="btn btn-success">Approve</a>
+                    <a href="/Approvals/Reject/@claim.ClaimID" class="btn btn-danger">Reject</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
