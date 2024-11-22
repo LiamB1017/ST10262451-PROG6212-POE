@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Claim>
+
+<h2>Review Claims</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Lecturer</th>
+            <th>Hours Worked</th>
+            <th>Hourly Rate</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.LecturerId</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.HourlyRate</td>
+                <td>@claim.TotalAmount</td>
+                <td>@claim.Status</td>
+                <td>
+                    <form asp-action="ApproveClaim" method="post">
+                        <input type="hidden" name="id" value="@claim.ClaimId" />
+                        <button type="submit">Approve</button>
+                    </form>
+                    <form asp-action="RejectClaim" method="post">
+                        <input type="hidden" name="id" value="@claim.ClaimId" />
+                        <button type="submit">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
