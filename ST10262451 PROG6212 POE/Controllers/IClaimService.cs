@@ -46,4 +46,5 @@
 
 public interface IClaimService
 {
+    Task SubmitClaimAsync(Claim claim);
 }
