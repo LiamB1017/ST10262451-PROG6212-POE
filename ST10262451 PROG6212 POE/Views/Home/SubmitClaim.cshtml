@@ -1,0 +1,19 @@
+﻿@model Claim
+
+<h2>Submit Claim</h2>
+
+<form asp-action="SubmitClaim" method="post" enctype="multipart/form-data">
+    <label for="hoursWorked">Hours Worked</label>
+    <input type="number" asp-for="HoursWorked" />
+
+    <label for="hourlyRate">Hourly Rate</label>
+    <input type="number" asp-for="HourlyRate" />
+
+    <label for="notes">Notes</label>
+    <textarea asp-for="Notes"></textarea>
+
+    <label for="supportingDocument">Supporting Document</label>
+    <input type="file" asp-for="SupportingDocument" />
+
+    <button type="submit">Submit Claim</button>
+</form>
