@@ -7,4 +7,5 @@
     public double TotalAmount => HoursWorked * HourlyRate;
     public DateTime SubmissionDate { get; set; }
     public string Status { get; set; }
+    public string SupportingDocumentPath { get; internal set; }
 }
