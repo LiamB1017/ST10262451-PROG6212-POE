@@ -1,45 +1,81 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace YourProject.Controllers
+public class ClaimsController : Controller
 {
-    public class ClaimsController : Controller
+    private readonly ApplicationDbContext _context;
+
+    public ClaimsController(ApplicationDbContext context)
     {
-        private readonly IClaimService _claimService;
-        private readonly IWebHostEnvironment _environment;
+        _context = context;
+    }
 
-        public ClaimsController(IClaimService claimService, IWebHostEnvironment environment)
-        {
-            _claimService = claimService;
-            _environment = environment;
-        }
+    // Lecturer submits claim
+    [HttpGet]
+    public IActionResult SubmitClaim()
+    {
+        return View();
+    }
 
-        // POST: Claims/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Claim claim, IFormFile file)
+    [HttpPost]
+    public async Task<IActionResult> SubmitClaim(Claim claim, IFormFile supportingDocument)
+    {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
+            // Auto-calculate total amount
+            claim.TotalAmount = claim.HoursWorked * claim.HourlyRate;
+
+            if (supportingDocument != null)
             {
-                if (file != null && file.Length > 0)
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", supportingDocument.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    // File upload logic
-                    var uploads = Path.Combine(_environment.WebRootPath, "uploads");
-                    var filePath = Path.Combine(uploads, file.FileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await file.CopyToAsync(stream);
-                    }
-
-                    // Save the file path to the claim object
-                    claim.SupportingDocumentPath = filePath;
+                    await supportingDocument.CopyToAsync(stream);
                 }
-
-                await _claimService.SubmitClaimAsync(claim);
-                return RedirectToAction("Index", "Claims");
+                claim.SupportingDocument = "/uploads/" + supportingDocument.FileName;
             }
 
-            return View(claim);
+            claim.Status = "Pending";
+            claim.DateSubmitted = DateTime.Now;
+
+            _context.Add(claim);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
+        return View(claim);
+    }
+
+    // Coordinator/Manager reviews claims
+    [HttpGet]
+    public async Task<IActionResult> ReviewClaims()
+    {
+        var claims = await _context.Claims.Where(c => c.Status == "Pending").ToListAsync();
+        return View(claims);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ApproveClaim(int id)
+    {
+        var claim = await _context.Claims.FindAsync(id);
+        if (claim != null)
+        {
+            claim.Status = "Approved";
+            _context.Update(claim);
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction("ReviewClaims");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> RejectClaim(int id)
+    {
+        var claim = await _context.Claims.FindAsync(id);
+        if (claim != null)
+        {
+            claim.Status = "Rejected";
+            _context.Update(claim);
+            await _context.SaveChangesAsync();
+        }
+        return RedirectToAction("ReviewClaims");
     }
 }
