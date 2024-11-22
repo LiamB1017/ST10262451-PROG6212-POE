@@ -25,3 +25,13 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddDbContext<YourDbContext>(options =>
+        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+    services.AddScoped<IClaimService, ClaimService>();  // Register ClaimService
+
+    services.AddControllersWithViews();
+}
